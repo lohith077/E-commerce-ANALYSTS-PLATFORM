@@ -1,0 +1,40 @@
+Deploying on AWS EC2More actions
+As part of the deployment process for this eCommerce platform, an Amazon EC2 (Elastic Compute Cloud) instance is created to host the application. EC2 provides scalable virtual servers in the cloud, allowing us to install and configure the necessary software stack (Apache/Nginx, PHP, MySQL, Laravel/Bagisto) for running the platform.
+
+✅ Key Steps:
+Instance Launch: A new EC2 instance (e.g., t2.micro) is launched using a Linux-based AMI such as Ubuntu 22.04 LTS.
+
+Security Group Configuration: The security group is updated to allow inbound access to ports:
+
+22 (SSH for remote login)
+
+80 (HTTP for web access)
+
+443 (HTTPS, if SSL is enabled)
+
+SSH Access: The instance is accessed securely using a private key (.pem file) from a terminal.
+
+Environment Setup:
+
+System packages are updated (apt update && apt upgrade)
+
+Required software (PHP, MySQL, Apache/Nginx, Composer) is installed
+
+Application Hosting:
+
+The Bagisto eCommerce codebase is uploaded via git or scp
+
+File permissions and .env variables are configured
+
+Database is set up, and Laravel commands (migrate, key:generate) are run
+
+Apache/Nginx is configured to serve the app
+
+🔐 Best Practices:
+Keep SSH ports secure and restrict access using IP whitelisting.
+
+Regularly update packages and monitor resource usage.
+
+Store environment secrets securely (avoid hardcoding credentials in the .env file).
+
+This setup enables scalable, reliable hosting of the full-stack Laravel eCommerce platform on the cloud.
