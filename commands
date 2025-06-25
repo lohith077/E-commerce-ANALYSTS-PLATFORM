@@ -1,0 +1,79 @@
+change to your directory in which pem file exists:More actions
+cd path to your pem file
+chmod 400 your pem file
+connect to your ec2 instance:
+ssh -i your pem file ubuntu@your ec2 instance ipv4 address
+# 1. Update and install required packages
+sudo apt update && sudo apt upgrade -y
+sudo apt install apache2 mysql-server php php-common php-cli php-mbstring php-xml php-bcmath php-curl php-zip php-mysql unzip curl git -y
+
+# 2. Start and enable Apache & MySQL
+sudo systemctl start apache2
+sudo systemctl start mysql
+sudo systemctl enable apache2
+sudo systemctl enable mysql
+
+# 3. Install Composer
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+composer --version
+
+# 4. Setup MySQL Database
+sudo mysql -u root -p
+# Inside MySQL prompt:
+# CREATE DATABASE bagisto;
+# CREATE USER 'bagistouser'@'localhost' IDENTIFIED BY 'your_password';
+# GRANT ALL PRIVILEGES ON bagisto.* TO 'bagistouser'@'localhost';
+# FLUSH PRIVILEGES;
+# EXIT;
+
+# 5. Clone Bagisto project
+cd /var/www
+sudo git clone https://github.com/bagisto/bagisto.git
+sudo chown -R www-data:www-data bagisto
+cd bagisto
+
+# 6. Install dependencies
+composer install
+
+# 7. Set permissions
+sudo chmod -R 775 storage
+sudo chmod -R 775 bootstrap/cache
+sudo chown -R www-data:www-data storage
+sudo chown -R www-data:www-data bootstrap/cache
+
+# 8. Create and edit environment file
+cp .env.example .env
+nano .env
+# Set DB_DATABASE, DB_USERNAME, DB_PASSWORD
+
+# 9. Generate application key
+php artisan key:generate
+
+# 10. Migrate and seed the database
+php artisan migrate
+php artisan db:seed
+
+# 11. Clear and cache Laravel configuration
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+
+# 12. Fix .env write permission if needed
+sudo chmod 664 .env
+
+# 13. Fix final permissions
+sudo chmod -R 775 storage bootstrap/cache
+sudo chown -R www-data:www-data /var/www/bagisto
+
+# 14. (Optional) Configure Apache virtual host
+sudo nano /etc/apache2/sites-available/bagisto.conf
+# Add VirtualHost config and save
+
+sudo a2ensite bagisto.conf
+sudo a2enmod rewrite
+sudo systemctl reload apache2
+
+# 15. Access from browser
+# http://<your-ec2-public-ip>
